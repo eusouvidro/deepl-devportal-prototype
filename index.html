@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepL Developer Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS RESET & TOKENS ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a1628;
+  --bg-raised: #0f1d32;
+  --bg-card: #131f35;
+  --bg-card-hover: #182742;
+  --border: #1e3a5f;
+  --border-subtle: #162d4a;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --brand: #0F2B46;
+  --teal: #0ea5e9;
+  --green: #10b981;
+  --purple: #8b5cf6;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --pink: #ec4899;
+  --font: 'Inter', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --max-w: 1280px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --transition: 0.2s ease;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { color: var(--teal); text-decoration: none; transition: color var(--transition); }
+a:hover { color: #38bdf8; }
+
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes flowDot {
+  0% { offset-distance: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== STICKY NAV ===== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(10, 22, 40, 0.8);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.3s ease;
+}
+.nav-inner {
+  max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; font-size: 20px; color: var(--text);
+}
+.nav-logo svg { width: 28px; height: 28px; }
+.nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+.nav-links a {
+  color: var(--text-muted); font-size: 14px; font-weight: 500;
+  transition: color var(--transition); position: relative;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.nav-links a.active::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+  height: 2px; background: var(--teal); border-radius: 1px;
+}
+.nav-cta {
+  background: var(--teal); color: #fff; padding: 8px 20px;
+  border-radius: var(--radius-xs); font-size: 14px; font-weight: 600;
+  border: none; cursor: pointer; transition: all var(--transition);
+}
+.nav-cta:hover { background: #0284c7; color: #fff; transform: translateY(-1px); }
+.hamburger {
+  display: none; background: none; border: none; cursor: pointer;
+  color: var(--text); padding: 8px;
+}
+.hamburger svg { width: 24px; height: 24px; }
+
+/* Mobile nav */
+.mobile-nav {
+  display: none; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 22, 40, 0.98); backdrop-filter: blur(20px);
+  z-index: 999; padding: 24px;
+}
+.mobile-nav.open { display: flex; flex-direction: column; gap: 8px; }
+.mobile-nav a {
+  color: var(--text-muted); font-size: 18px; font-weight: 500;
+  padding: 12px 0; border-bottom: 1px solid var(--border-subtle);
+  display: block;
+}
+.mobile-nav a:hover { color: var(--text); }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 140px 0 100px; position: relative; overflow: hidden;
+}
+.hero-orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15;
+  pointer-events: none; animation: orbFloat 8s ease-in-out infinite;
+}
+.hero-orb-1 { width: 500px; height: 500px; background: var(--teal); top: -100px; right: -100px; }
+.hero-orb-2 { width: 400px; height: 400px; background: var(--purple); bottom: -50px; left: -100px; animation-delay: -3s; }
+.hero-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+  align-items: center; position: relative;
+}
+.hero-content { z-index: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.2);
+  padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--teal);
+  font-weight: 500; margin-bottom: 24px;
+}
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s infinite; }
+.hero h1 {
+  font-size: 56px; font-weight: 800; line-height: 1.08;
+  letter-spacing: -0.03em; margin-bottom: 20px;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 18px; color: var(--text-muted); line-height: 1.7;
+  margin-bottom: 36px; max-width: 480px;
+}
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--teal); color: #fff; padding: 12px 28px;
+  border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+  border: none; cursor: pointer; transition: all var(--transition);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary:hover { background: #0284c7; color: #fff; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(14,165,233,0.25); }
+.btn-secondary {
+  background: transparent; color: var(--text); padding: 12px 28px;
+  border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all var(--transition); display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-raised); }
+.hero-code {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 24px; overflow: hidden;
+  position: relative; z-index: 1;
+}
+.hero-code-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle);
+}
+.hero-code-dot { width: 10px; height: 10px; border-radius: 50%; }
+.hero-code-dot:nth-child(1) { background: #ef4444; }
+.hero-code-dot:nth-child(2) { background: #f59e0b; }
+.hero-code-dot:nth-child(3) { background: #10b981; }
+.hero-code-lang {
+  margin-left: auto; font-size: 12px; color: var(--text-dim);
+  font-family: var(--mono);
+}
+.hero-code pre {
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.8;
+  overflow-x: auto; color: var(--text-muted);
+}
+
+/* Syntax colors */
+.syn-kw { color: #c084fc; }
+.syn-fn { color: #60a5fa; }
+.syn-str { color: #34d399; }
+.syn-cm { color: #475569; font-style: italic; }
+.syn-num { color: #f59e0b; }
+.syn-op { color: #94a3b8; }
+.syn-var { color: #e2e8f0; }
+.syn-cls { color: #fbbf24; }
+.syn-prop { color: #7dd3fc; }
+.syn-bool { color: #f97316; }
+
+/* ===== SECTION COMMON ===== */
+.section { padding: 100px 0; }
+.section-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 16px;
+}
+.section-label.teal { color: var(--teal); }
+.section-label.purple { color: var(--purple); }
+.section-label.green { color: var(--green); }
+.section-label.amber { color: var(--amber); }
+.section-title {
+  font-size: 40px; font-weight: 800; letter-spacing: -0.02em;
+  line-height: 1.15; margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 17px; color: var(--text-muted); max-width: 600px;
+  line-height: 1.7; margin-bottom: 48px;
+}
+
+/* ===== CAPABILITY SUITES ===== */
+.suites-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.suite-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 32px; position: relative;
+  overflow: hidden; transition: all 0.3s ease; cursor: default;
+}
+.suite-card:hover { border-color: var(--border); transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2); }
+.suite-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.suite-card.teal::before { background: linear-gradient(90deg, var(--teal), #06b6d4); }
+.suite-card.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+.suite-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+.suite-icon {
+  width: 48px; height: 48px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px; font-size: 22px;
+}
+.suite-card.teal .suite-icon { background: rgba(14,165,233,0.12); color: var(--teal); }
+.suite-card.purple .suite-icon { background: rgba(139,92,246,0.12); color: var(--purple); }
+.suite-card.green .suite-icon { background: rgba(16,185,129,0.12); color: var(--green); }
+.suite-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.suite-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
+.suite-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.suite-features li {
+  font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;
+}
+.suite-features li::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.suite-card.teal .suite-features li::before { background: var(--teal); }
+.suite-card.purple .suite-features li::before { background: var(--purple); }
+.suite-card.green .suite-features li::before { background: var(--green); }
+
+/* ===== WORKFLOW PIPELINES ===== */
+.pipeline-section { background: var(--bg-raised); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); }
+.pipeline-tabs {
+  display: flex; gap: 4px; margin-bottom: 40px;
+  background: var(--bg-card); border-radius: var(--radius-sm);
+  padding: 4px; border: 1px solid var(--border-subtle); width: fit-content;
+}
+.pipeline-tab {
+  padding: 10px 24px; border-radius: var(--radius-xs);
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+  cursor: pointer; border: none; background: none;
+  transition: all var(--transition); white-space: nowrap;
+}
+.pipeline-tab.active { background: var(--teal); color: #fff; }
+.pipeline-tab:not(.active):hover { color: var(--text); }
+
+.pipeline-container { display: none; }
+.pipeline-container.active { display: block; }
+
+.pipeline-visual {
+  display: flex; align-items: center; gap: 0;
+  padding: 40px 0; overflow-x: auto; justify-content: center;
+}
+.pipeline-node {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  cursor: pointer; position: relative; flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.pipeline-node:hover .pipeline-node-circle,
+.pipeline-node.active .pipeline-node-circle { transform: scale(1.1); }
+.pipeline-node-circle {
+  width: 72px; height: 72px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; transition: all 0.3s ease;
+  border: 2px solid transparent; position: relative;
+}
+.pipeline-node.active .pipeline-node-circle { border-color: var(--teal); box-shadow: 0 0 24px rgba(14,165,233,0.3); }
+.pipeline-node-label {
+  font-size: 12px; font-weight: 600; color: var(--text-muted);
+  text-align: center; max-width: 80px;
+}
+.pipeline-node.active .pipeline-node-label { color: var(--text); }
+.pipeline-node-badge {
+  position: absolute; top: -6px; right: -6px; font-size: 9px;
+  padding: 2px 6px; border-radius: 4px; font-weight: 600;
+}
+.badge-existing { background: rgba(16,185,129,0.15); color: var(--green); }
+.badge-future { background: rgba(245,158,11,0.15); color: var(--amber); }
+
+.pipeline-connector {
+  width: 60px; height: 2px; background: var(--border); position: relative;
+  flex-shrink: 0; overflow: visible;
+}
+.pipeline-connector-dot {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); top: -2px;
+  animation: connectorFlow 2s linear infinite;
+}
+@keyframes connectorFlow {
+  0% { left: -6px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: calc(100% + 6px); opacity: 0; }
+}
+
+.pipeline-detail {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 24px; margin-top: 32px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  min-height: 140px;
+}
+.pipeline-detail-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.pipeline-detail-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+.pipeline-detail-endpoint {
+  font-family: var(--mono); font-size: 13px; padding: 8px 12px;
+  background: var(--bg); border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle); color: var(--teal);
+}
+.pipeline-detail-sdk {
+  font-family: var(--mono); font-size: 13px; color: var(--text-muted);
+}
+.pipeline-detail-sdk code { color: var(--green); }
+
+/* ===== CODE EXAMPLES ===== */
+.code-section-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
+.lang-tabs {
+  display: flex; gap: 4px; background: var(--bg-card);
+  border-radius: var(--radius-xs); padding: 3px;
+  border: 1px solid var(--border-subtle);
+}
+.lang-tab {
+  padding: 7px 16px; border-radius: 5px; font-size: 13px;
+  font-weight: 500; color: var(--text-muted); cursor: pointer;
+  border: none; background: none; transition: all var(--transition);
+  font-family: var(--font);
+}
+.lang-tab.active { background: var(--bg-raised); color: var(--text); }
+.lang-tab:not(.active):hover { color: var(--text); }
+
+.example-tabs {
+  display: flex; gap: 4px; margin-bottom: 20px;
+}
+.example-tab {
+  padding: 8px 16px; border-radius: var(--radius-xs); font-size: 13px;
+  font-weight: 500; color: var(--text-dim); cursor: pointer;
+  border: 1px solid transparent; background: none;
+  transition: all var(--transition); font-family: var(--font);
+}
+.example-tab.active { border-color: var(--border); color: var(--text); background: var(--bg-card); }
+.example-tab:not(.active):hover { color: var(--text-muted); }
+
+.code-block {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); overflow: hidden; display: none;
+}
+.code-block.active { display: block; }
+.code-block-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; border-bottom: 1px solid var(--border-subtle);
+}
+.code-block-file { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+.copy-btn {
+  background: none; border: 1px solid var(--border-subtle); color: var(--text-muted);
+  padding: 4px 12px; border-radius: 4px; font-size: 12px;
+  cursor: pointer; transition: all var(--transition); font-family: var(--font);
+}
+.copy-btn:hover { border-color: var(--border); color: var(--text); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+.code-block pre {
+  padding: 20px; font-family: var(--mono); font-size: 13.5px;
+  line-height: 1.8; overflow-x: auto; color: var(--text-muted);
+}
+
+/* ===== SDK GRID ===== */
+.sdk-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.sdk-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 24px;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.sdk-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.sdk-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.sdk-card-lang {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 16px; font-weight: 700;
+}
+.sdk-card-lang-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.sdk-card-status {
+  font-size: 11px; font-weight: 600; padding: 3px 8px;
+  border-radius: 4px;
+}
+.status-available { background: rgba(16,185,129,0.12); color: var(--green); }
+.status-soon { background: rgba(245,158,11,0.12); color: var(--amber); }
+.sdk-card-pkg {
+  font-family: var(--mono); font-size: 12px; color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.sdk-card-install {
+  font-family: var(--mono); font-size: 12px; color: var(--text-muted);
+  background: var(--bg); padding: 8px 12px; border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle); overflow-x: auto; white-space: nowrap;
+}
+
+/* ===== INTEGRATIONS ===== */
+.integrations-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin-bottom: 32px;
+}
+.integration-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 24px; text-align: center;
+  transition: all 0.3s ease;
+}
+.integration-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.integration-icon {
+  width: 48px; height: 48px; border-radius: 10px;
+  background: var(--bg); display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 12px; font-size: 20px;
+}
+.integration-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.integration-card p { font-size: 12px; color: var(--text-dim); }
+
+.featured-integration {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 24px; margin-top: 24px;
+}
+.featured-integration h4 {
+  font-size: 14px; font-weight: 600; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.featured-badge {
+  font-size: 10px; background: rgba(139,92,246,0.12); color: var(--purple);
+  padding: 2px 8px; border-radius: 4px; font-weight: 600;
+}
+
+/* ===== QUICKSTARTS ===== */
+.quickstart-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+.quickstart-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius); padding: 24px;
+  transition: all 0.3s ease; cursor: pointer;
+}
+.quickstart-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.quickstart-meta {
+  display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.quickstart-time {
+  font-size: 11px; color: var(--text-dim); background: var(--bg);
+  padding: 2px 8px; border-radius: 4px;
+}
+.quickstart-diff {
+  font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;
+}
+.diff-easy { background: rgba(16,185,129,0.12); color: var(--green); }
+.diff-medium { background: rgba(245,158,11,0.12); color: var(--amber); }
+.quickstart-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.quickstart-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
+.quickstart-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.quickstart-tag {
+  font-size: 11px; font-family: var(--mono); color: var(--text-dim);
+  background: var(--bg); padding: 2px 8px; border-radius: 4px;
+}
+
+/* ===== API REFERENCE PREVIEW ===== */
+.api-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--bg-card); border-radius: var(--radius);
+  overflow: hidden; border: 1px solid var(--border-subtle);
+}
+.api-table thead th {
+  padding: 12px 20px; text-align: left; font-size: 12px;
+  font-weight: 600; color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 0.05em; border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-raised);
+}
+.api-table tbody td {
+  padding: 14px 20px; font-size: 14px; border-bottom: 1px solid var(--border-subtle);
+}
+.api-table tbody tr:last-child td { border-bottom: none; }
+.api-table tbody tr:hover { background: var(--bg-raised); }
+.method-badge {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px; display: inline-block;
+  min-width: 52px; text-align: center;
+}
+.method-post { background: rgba(16,185,129,0.12); color: var(--green); }
+.method-get { background: rgba(14,165,233,0.12); color: var(--teal); }
+.method-delete { background: rgba(239,68,68,0.12); color: var(--red); }
+.api-path { font-family: var(--mono); font-size: 13px; color: var(--teal); }
+.api-desc { color: var(--text-muted); }
+.api-cta-row { text-align: center; padding: 20px; }
+
+/* ===== FOOTER ===== */
+.footer {
+  border-top: 1px solid var(--border-subtle); padding: 64px 0 32px;
+}
+.footer-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+  margin-bottom: 48px;
+}
+.footer-col h5 {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.footer-col a {
+  display: block; color: var(--text-dim); font-size: 14px;
+  padding: 4px 0; transition: color var(--transition);
+}
+.footer-col a:hover { color: var(--text-muted); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 24px; border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-bottom p { font-size: 13px; color: var(--text-dim); }
+.footer-legal { display: flex; gap: 24px; }
+.footer-legal a { font-size: 13px; color: var(--text-dim); }
+.footer-legal a:hover { color: var(--text-muted); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1280px) {
+  .hero h1 { font-size: 48px; }
+}
+@media (max-width: 1000px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+  .hero h1 { font-size: 42px; }
+  .suites-grid { grid-template-columns: 1fr; }
+  .sdk-grid { grid-template-columns: repeat(2, 1fr); }
+  .integrations-grid { grid-template-columns: repeat(2, 1fr); }
+  .quickstart-grid { grid-template-columns: repeat(2, 1fr); }
+  .pipeline-visual { justify-content: flex-start; }
+  .pipeline-detail { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .hamburger { display: block; }
+  .hero { padding: 110px 0 60px; }
+  .hero h1 { font-size: 32px; }
+  .hero p { font-size: 16px; }
+  .hero-ctas { flex-direction: column; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+  .section-title { font-size: 28px; }
+  .section { padding: 60px 0; }
+  .suites-grid { grid-template-columns: 1fr; }
+  .sdk-grid { grid-template-columns: 1fr; }
+  .integrations-grid { grid-template-columns: 1fr; }
+  .quickstart-grid { grid-template-columns: 1fr; }
+  .pipeline-tabs { overflow-x: auto; width: 100%; }
+  .pipeline-visual {
+    flex-direction: column; align-items: center; gap: 0;
+  }
+  .pipeline-connector {
+    width: 2px; height: 40px;
+  }
+  .pipeline-connector-dot {
+    animation-name: connectorFlowV;
+    left: -2px; top: -6px;
+  }
+  @keyframes connectorFlowV {
+    0% { top: -6px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: calc(100% + 6px); opacity: 0; }
+  }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+  .code-section-header { flex-direction: column; align-items: flex-start; }
+  .lang-tabs { overflow-x: auto; width: 100%; }
+  .api-table { font-size: 13px; }
+  .api-table thead th, .api-table tbody td { padding: 10px 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#0ea5e9"/><path d="M7 10h14M7 14h10M7 18h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      DeepL <span style="font-weight:400;color:var(--text-muted)">Developers</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#translate">Translate</a></li>
+      <li><a href="#voice">Voice</a></li>
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#sdks">SDKs</a></li>
+      <li><a href="#api-reference">API Reference</a></li>
+    </ul>
+    <button class="nav-cta" onclick="window.location.hash='#hero'">Get API Key</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#translate" onclick="closeMobile()">Translate</a>
+  <a href="#voice" onclick="closeMobile()">Voice</a>
+  <a href="#platform" onclick="closeMobile()">Platform</a>
+  <a href="#sdks" onclick="closeMobile()">SDKs</a>
+  <a href="#api-reference" onclick="closeMobile()">API Reference</a>
+  <a href="#" style="color:var(--teal);margin-top:16px;">Get API Key &rarr;</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge"><span class="hero-badge-dot"></span> Now in public beta: Voice API</div>
+        <h1>Language intelligence APIs for every workflow</h1>
+        <p>Translate text, documents, and speech across 30+ languages. Build localization pipelines, voice translation, and multilingual products with a single API.</p>
+        <div class="hero-ctas">
+          <button class="btn-primary">Get Free API Key <span>&rarr;</span></button>
+          <button class="btn-secondary">Explore Docs</button>
+        </div>
+      </div>
+      <div class="hero-code">
+        <div class="hero-code-header">
+          <span class="hero-code-dot"></span>
+          <span class="hero-code-dot"></span>
+          <span class="hero-code-dot"></span>
+          <span class="hero-code-lang">translate.py</span>
+        </div>
+        <pre><span class="syn-kw">import</span> <span class="syn-var">deepl</span>
+
+<span class="syn-cm"># Initialize with your API key</span>
+<span class="syn-var">translator</span> <span class="syn-op">=</span> <span class="syn-var">deepl</span><span class="syn-op">.</span><span class="syn-cls">Translator</span><span class="syn-op">(</span><span class="syn-str">"your-api-key"</span><span class="syn-op">)</span>
+
+<span class="syn-cm"># Translate text in one call</span>
+<span class="syn-var">result</span> <span class="syn-op">=</span> <span class="syn-var">translator</span><span class="syn-op">.</span><span class="syn-fn">translate_text</span><span class="syn-op">(</span>
+    <span class="syn-str">"Hello, world!"</span><span class="syn-op">,</span>
+    <span class="syn-prop">target_lang</span><span class="syn-op">=</span><span class="syn-str">"DE"</span>
+<span class="syn-op">)</span>
+
+<span class="syn-fn">print</span><span class="syn-op">(</span><span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-prop">text</span><span class="syn-op">)</span>
+<span class="syn-cm"># → "Hallo, Welt!"</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CAPABILITY SUITES ===== -->
+<section class="section" id="translate">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label teal">&#9670; Capability Suites</div>
+      <h2 class="section-title">Three suites. One platform.</h2>
+      <p class="section-desc">Everything you need to build multilingual products, from real-time text translation to full document localization and voice workflows.</p>
+    </div>
+    <div class="suites-grid">
+      <div class="suite-card teal animate-on-scroll" style="transition-delay:0.1s">
+        <div class="suite-icon">&#9998;</div>
+        <h3>DeepL Translate</h3>
+        <p>Industry-leading neural machine translation for text, documents, and entire websites. 30+ languages with context-aware accuracy.</p>
+        <ul class="suite-features">
+          <li>Real-time text translation</li>
+          <li>Document translation (PDF, DOCX, PPTX)</li>
+          <li>Website & HTML translation</li>
+          <li>Translation memory & glossaries</li>
+          <li>Formality & tone controls</li>
+        </ul>
+      </div>
+      <div class="suite-card purple animate-on-scroll" id="voice" style="transition-delay:0.2s">
+        <div class="suite-icon">&#127908;</div>
+        <h3>DeepL Voice</h3>
+        <p>Transcribe, translate, and synthesize speech. Build voice translation pipelines for meetings, content, and real-time communication.</p>
+        <ul class="suite-features">
+          <li>Speech-to-text transcription</li>
+          <li>Voice-to-voice translation</li>
+          <li>Real-time streaming mode</li>
+          <li>Batch audio processing</li>
+          <li>Speaker diarization</li>
+        </ul>
+      </div>
+      <div class="suite-card green animate-on-scroll" id="platform" style="transition-delay:0.3s">
+        <div class="suite-icon">&#9881;</div>
+        <h3>DeepL Platform</h3>
+        <p>Manage keys, monitor usage, configure glossaries, and set up webhooks. Full programmatic control over your translation infrastructure.</p>
+        <ul class="suite-features">
+          <li>API key management</li>
+          <li>Usage analytics & quotas</li>
+          <li>Webhook event subscriptions</li>
+          <li>Custom glossaries</li>
+          <li>Team & organization admin</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WORKFLOW PIPELINES ===== -->
+<section class="section pipeline-section" id="workflows">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label purple">&#9656; Workflow Pipelines</div>
+      <h2 class="section-title">APIs designed for workflows, not just endpoints</h2>
+      <p class="section-desc">Chain DeepL APIs into production pipelines. Click any node to see the endpoint details and SDK methods.</p>
+    </div>
+    <div class="animate-on-scroll">
+      <div class="pipeline-tabs" id="pipelineTabs">
+        <button class="pipeline-tab active" data-pipeline="doc">Document Translation</button>
+        <button class="pipeline-tab" data-pipeline="voice">Voice Translation</button>
+        <button class="pipeline-tab" data-pipeline="loc">Content Localization</button>
+      </div>
+    </div>
+
+    <!-- Document Translation Pipeline -->
+    <div class="pipeline-container active" id="pipeline-doc">
+      <div class="pipeline-visual animate-on-scroll">
+        <div class="pipeline-node active" data-node="upload" data-pipeline="doc">
+          <div class="pipeline-node-circle" style="background:rgba(14,165,233,0.12);">&#128196;</div>
+          <span class="pipeline-node-label">Upload</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot"></div></div>
+        <div class="pipeline-node" data-node="extract" data-pipeline="doc">
+          <div class="pipeline-node-circle" style="background:rgba(139,92,246,0.12);">&#128269;</div>
+          <span class="pipeline-node-label">Extract</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-0.4s"></div></div>
+        <div class="pipeline-node" data-node="translate-doc" data-pipeline="doc">
+          <div class="pipeline-node-circle" style="background:rgba(16,185,129,0.12);">&#127760;</div>
+          <span class="pipeline-node-label">Translate</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-0.8s"></div></div>
+        <div class="pipeline-node" data-node="assemble" data-pipeline="doc">
+          <div class="pipeline-node-circle" style="background:rgba(245,158,11,0.12);">&#128230;</div>
+          <span class="pipeline-node-label">Assemble</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-1.2s"></div></div>
+        <div class="pipeline-node" data-node="download" data-pipeline="doc">
+          <div class="pipeline-node-circle" style="background:rgba(14,165,233,0.12);">&#11015;</div>
+          <span class="pipeline-node-label">Download</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+      </div>
+      <div class="pipeline-detail animate-on-scroll" id="detail-doc">
+        <div>
+          <div class="pipeline-detail-title">Upload Document</div>
+          <div class="pipeline-detail-desc">Upload a document (PDF, DOCX, PPTX, XLSX, HTML, TXT) for translation. The API extracts translatable content while preserving formatting.</div>
+          <div class="pipeline-detail-endpoint">POST /v2/document</div>
+        </div>
+        <div>
+          <div class="pipeline-detail-title" style="margin-bottom:12px">SDK Method</div>
+          <div class="pipeline-detail-sdk">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Python</strong></div>
+            <code>translator.translate_document_upload()</code>
+          </div>
+          <div class="pipeline-detail-sdk" style="margin-top:12px">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Node.js</strong></div>
+            <code>translator.translateDocument()</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Translation Pipeline -->
+    <div class="pipeline-container" id="pipeline-voice">
+      <div class="pipeline-visual animate-on-scroll">
+        <div class="pipeline-node active" data-node="ingest" data-pipeline="voice">
+          <div class="pipeline-node-circle" style="background:rgba(139,92,246,0.12);">&#127908;</div>
+          <span class="pipeline-node-label">Ingest</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot"></div></div>
+        <div class="pipeline-node" data-node="transcribe" data-pipeline="voice">
+          <div class="pipeline-node-circle" style="background:rgba(14,165,233,0.12);">&#128221;</div>
+          <span class="pipeline-node-label">Transcribe</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-0.4s"></div></div>
+        <div class="pipeline-node" data-node="translate-voice" data-pipeline="voice">
+          <div class="pipeline-node-circle" style="background:rgba(16,185,129,0.12);">&#127760;</div>
+          <span class="pipeline-node-label">Translate</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-0.8s"></div></div>
+        <div class="pipeline-node" data-node="synthesize" data-pipeline="voice">
+          <div class="pipeline-node-circle" style="background:rgba(236,72,153,0.12);">&#128264;</div>
+          <span class="pipeline-node-label">Synthesize</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-1.2s"></div></div>
+        <div class="pipeline-node" data-node="deliver" data-pipeline="voice">
+          <div class="pipeline-node-circle" style="background:rgba(245,158,11,0.12);">&#128228;</div>
+          <span class="pipeline-node-label">Deliver</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+      </div>
+      <div class="pipeline-detail animate-on-scroll" id="detail-voice">
+        <div>
+          <div class="pipeline-detail-title">Ingest Audio</div>
+          <div class="pipeline-detail-desc">Upload audio or video files for processing. Supports MP3, WAV, M4A, MP4, and WebM formats up to 500MB.</div>
+          <div class="pipeline-detail-endpoint">POST /v2/voice/ingest</div>
+        </div>
+        <div>
+          <div class="pipeline-detail-title" style="margin-bottom:12px">SDK Method</div>
+          <div class="pipeline-detail-sdk">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Python</strong></div>
+            <code>voice.ingest(file_path)</code>
+          </div>
+          <div class="pipeline-detail-sdk" style="margin-top:12px">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Node.js</strong></div>
+            <code>voice.ingest(filePath)</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Localization Pipeline -->
+    <div class="pipeline-container" id="pipeline-loc">
+      <div class="pipeline-visual animate-on-scroll">
+        <div class="pipeline-node active" data-node="push" data-pipeline="loc">
+          <div class="pipeline-node-circle" style="background:rgba(16,185,129,0.12);">&#128640;</div>
+          <span class="pipeline-node-label">Push</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot"></div></div>
+        <div class="pipeline-node" data-node="match-tm" data-pipeline="loc">
+          <div class="pipeline-node-circle" style="background:rgba(245,158,11,0.12);">&#128451;</div>
+          <span class="pipeline-node-label">Match TM</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-0.4s"></div></div>
+        <div class="pipeline-node" data-node="translate-loc" data-pipeline="loc">
+          <div class="pipeline-node-circle" style="background:rgba(14,165,233,0.12);">&#127760;</div>
+          <span class="pipeline-node-label">Translate</span>
+          <span class="pipeline-node-badge badge-existing">Existing</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-0.8s"></div></div>
+        <div class="pipeline-node" data-node="review" data-pipeline="loc">
+          <div class="pipeline-node-circle" style="background:rgba(139,92,246,0.12);">&#9989;</div>
+          <span class="pipeline-node-label">Review</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+        <div class="pipeline-connector"><div class="pipeline-connector-dot" style="animation-delay:-1.2s"></div></div>
+        <div class="pipeline-node" data-node="pull" data-pipeline="loc">
+          <div class="pipeline-node-circle" style="background:rgba(16,185,129,0.12);">&#11015;</div>
+          <span class="pipeline-node-label">Pull</span>
+          <span class="pipeline-node-badge badge-future">Future</span>
+        </div>
+      </div>
+      <div class="pipeline-detail animate-on-scroll" id="detail-loc">
+        <div>
+          <div class="pipeline-detail-title">Push Content</div>
+          <div class="pipeline-detail-desc">Push source content (JSON, XLIFF, PO, strings files) from your repo or CMS into the localization pipeline via API or CI integration.</div>
+          <div class="pipeline-detail-endpoint">POST /v2/localize/push</div>
+        </div>
+        <div>
+          <div class="pipeline-detail-title" style="margin-bottom:12px">SDK Method</div>
+          <div class="pipeline-detail-sdk">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Python</strong></div>
+            <code>localize.push(source_path)</code>
+          </div>
+          <div class="pipeline-detail-sdk" style="margin-top:12px">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Node.js</strong></div>
+            <code>localize.push(sourcePath)</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CODE EXAMPLES ===== -->
+<section class="section" id="code-examples">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label green">&#60;/&#62; Code Examples</div>
+      <h2 class="section-title">Start building in minutes</h2>
+      <p class="section-desc">Copy-paste examples to get up and running fast. Every example works out of the box with your API key.</p>
+    </div>
+    <div class="code-section-header animate-on-scroll">
+      <div class="example-tabs" id="exampleTabs">
+        <button class="example-tab active" data-example="text">Translate Text</button>
+        <button class="example-tab" data-example="document">Translate Document</button>
+        <button class="example-tab" data-example="voice-ex">Batch Voice</button>
+      </div>
+      <div class="lang-tabs" id="langTabs">
+        <button class="lang-tab active" data-lang="python">Python</button>
+        <button class="lang-tab" data-lang="node">Node.js</button>
+        <button class="lang-tab" data-lang="curl">cURL</button>
+      </div>
+    </div>
+
+    <!-- Translate Text -->
+    <div class="code-block active" data-example="text" data-lang="python">
+      <div class="code-block-header">
+        <span class="code-block-file">translate_text.py</span>
+        <button class="copy-btn" data-copy="text-python">Copy</button>
+      </div>
+      <pre id="text-python"><span class="syn-kw">import</span> <span class="syn-var">deepl</span>
+
+<span class="syn-var">translator</span> <span class="syn-op">=</span> <span class="syn-var">deepl</span><span class="syn-op">.</span><span class="syn-cls">Translator</span><span class="syn-op">(</span><span class="syn-str">"YOUR_API_KEY"</span><span class="syn-op">)</span>
+
+<span class="syn-var">result</span> <span class="syn-op">=</span> <span class="syn-var">translator</span><span class="syn-op">.</span><span class="syn-fn">translate_text</span><span class="syn-op">(</span>
+    <span class="syn-str">"The quick brown fox jumps over the lazy dog."</span><span class="syn-op">,</span>
+    <span class="syn-prop">target_lang</span><span class="syn-op">=</span><span class="syn-str">"DE"</span><span class="syn-op">,</span>
+    <span class="syn-prop">formality</span><span class="syn-op">=</span><span class="syn-str">"more"</span>
+<span class="syn-op">)</span>
+
+<span class="syn-fn">print</span><span class="syn-op">(</span><span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-prop">text</span><span class="syn-op">)</span>
+<span class="syn-cm"># → "Der schnelle braune Fuchs springt über den faulen Hund."</span></pre>
+    </div>
+    <div class="code-block" data-example="text" data-lang="node">
+      <div class="code-block-header">
+        <span class="code-block-file">translate_text.js</span>
+        <button class="copy-btn" data-copy="text-node">Copy</button>
+      </div>
+      <pre id="text-node"><span class="syn-kw">import</span> <span class="syn-op">*</span> <span class="syn-kw">as</span> <span class="syn-var">deepl</span> <span class="syn-kw">from</span> <span class="syn-str">'deepl-node'</span><span class="syn-op">;</span>
+
+<span class="syn-kw">const</span> <span class="syn-var">translator</span> <span class="syn-op">=</span> <span class="syn-kw">new</span> <span class="syn-cls">deepl.Translator</span><span class="syn-op">(</span><span class="syn-str">'YOUR_API_KEY'</span><span class="syn-op">);</span>
+
+<span class="syn-kw">const</span> <span class="syn-var">result</span> <span class="syn-op">=</span> <span class="syn-kw">await</span> <span class="syn-var">translator</span><span class="syn-op">.</span><span class="syn-fn">translateText</span><span class="syn-op">(</span>
+    <span class="syn-str">'The quick brown fox jumps over the lazy dog.'</span><span class="syn-op">,</span>
+    <span class="syn-bool">null</span><span class="syn-op">,</span>
+    <span class="syn-str">'de'</span><span class="syn-op">,</span>
+    <span class="syn-op">{</span> <span class="syn-prop">formality</span><span class="syn-op">:</span> <span class="syn-str">'more'</span> <span class="syn-op">}</span>
+<span class="syn-op">);</span>
+
+<span class="syn-var">console</span><span class="syn-op">.</span><span class="syn-fn">log</span><span class="syn-op">(</span><span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-prop">text</span><span class="syn-op">);</span>
+<span class="syn-cm">// → "Der schnelle braune Fuchs springt über den faulen Hund."</span></pre>
+    </div>
+    <div class="code-block" data-example="text" data-lang="curl">
+      <div class="code-block-header">
+        <span class="code-block-file">translate_text.sh</span>
+        <button class="copy-btn" data-copy="text-curl">Copy</button>
+      </div>
+      <pre id="text-curl"><span class="syn-var">curl</span> <span class="syn-str">https://api.deepl.com/v2/translate</span> <span class="syn-op">\</span>
+  <span class="syn-op">-H</span> <span class="syn-str">"Authorization: DeepL-Auth-Key YOUR_API_KEY"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-H</span> <span class="syn-str">"Content-Type: application/json"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-d</span> <span class="syn-str">'{
+    "text": ["The quick brown fox jumps over the lazy dog."],
+    "target_lang": "DE",
+    "formality": "more"
+  }'</span></pre>
+    </div>
+
+    <!-- Translate Document -->
+    <div class="code-block" data-example="document" data-lang="python">
+      <div class="code-block-header">
+        <span class="code-block-file">translate_doc.py</span>
+        <button class="copy-btn" data-copy="doc-python">Copy</button>
+      </div>
+      <pre id="doc-python"><span class="syn-kw">import</span> <span class="syn-var">deepl</span>
+
+<span class="syn-var">translator</span> <span class="syn-op">=</span> <span class="syn-var">deepl</span><span class="syn-op">.</span><span class="syn-cls">Translator</span><span class="syn-op">(</span><span class="syn-str">"YOUR_API_KEY"</span><span class="syn-op">)</span>
+
+<span class="syn-cm"># Translate a PDF — formatting preserved</span>
+<span class="syn-var">translator</span><span class="syn-op">.</span><span class="syn-fn">translate_document_from_filepath</span><span class="syn-op">(</span>
+    <span class="syn-str">"report.pdf"</span><span class="syn-op">,</span>
+    <span class="syn-str">"report_de.pdf"</span><span class="syn-op">,</span>
+    <span class="syn-prop">target_lang</span><span class="syn-op">=</span><span class="syn-str">"DE"</span>
+<span class="syn-op">)</span>
+
+<span class="syn-fn">print</span><span class="syn-op">(</span><span class="syn-str">"Document translated successfully."</span><span class="syn-op">)</span></pre>
+    </div>
+    <div class="code-block" data-example="document" data-lang="node">
+      <div class="code-block-header">
+        <span class="code-block-file">translate_doc.js</span>
+        <button class="copy-btn" data-copy="doc-node">Copy</button>
+      </div>
+      <pre id="doc-node"><span class="syn-kw">import</span> <span class="syn-op">*</span> <span class="syn-kw">as</span> <span class="syn-var">deepl</span> <span class="syn-kw">from</span> <span class="syn-str">'deepl-node'</span><span class="syn-op">;</span>
+<span class="syn-kw">import</span> <span class="syn-op">{</span> <span class="syn-var">createReadStream</span><span class="syn-op">,</span> <span class="syn-var">createWriteStream</span> <span class="syn-op">}</span> <span class="syn-kw">from</span> <span class="syn-str">'fs'</span><span class="syn-op">;</span>
+
+<span class="syn-kw">const</span> <span class="syn-var">translator</span> <span class="syn-op">=</span> <span class="syn-kw">new</span> <span class="syn-cls">deepl.Translator</span><span class="syn-op">(</span><span class="syn-str">'YOUR_API_KEY'</span><span class="syn-op">);</span>
+
+<span class="syn-cm">// Translate a PDF — formatting preserved</span>
+<span class="syn-kw">await</span> <span class="syn-var">translator</span><span class="syn-op">.</span><span class="syn-fn">translateDocument</span><span class="syn-op">(</span>
+    <span class="syn-str">'report.pdf'</span><span class="syn-op">,</span>
+    <span class="syn-str">'report_de.pdf'</span><span class="syn-op">,</span>
+    <span class="syn-bool">null</span><span class="syn-op">,</span>
+    <span class="syn-str">'de'</span>
+<span class="syn-op">);</span>
+
+<span class="syn-var">console</span><span class="syn-op">.</span><span class="syn-fn">log</span><span class="syn-op">(</span><span class="syn-str">'Document translated successfully.'</span><span class="syn-op">);</span></pre>
+    </div>
+    <div class="code-block" data-example="document" data-lang="curl">
+      <div class="code-block-header">
+        <span class="code-block-file">translate_doc.sh</span>
+        <button class="copy-btn" data-copy="doc-curl">Copy</button>
+      </div>
+      <pre id="doc-curl"><span class="syn-cm"># Step 1: Upload document</span>
+<span class="syn-var">curl</span> <span class="syn-str">https://api.deepl.com/v2/document</span> <span class="syn-op">\</span>
+  <span class="syn-op">-H</span> <span class="syn-str">"Authorization: DeepL-Auth-Key YOUR_API_KEY"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-F</span> <span class="syn-str">"file=@report.pdf"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-F</span> <span class="syn-str">"target_lang=DE"</span>
+
+<span class="syn-cm"># Step 2: Poll status (use document_id from response)</span>
+<span class="syn-var">curl</span> <span class="syn-str">https://api.deepl.com/v2/document/{id}</span> <span class="syn-op">\</span>
+  <span class="syn-op">-H</span> <span class="syn-str">"Authorization: DeepL-Auth-Key YOUR_API_KEY"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-d</span> <span class="syn-str">'{"document_key": "..."}'</span>
+
+<span class="syn-cm"># Step 3: Download translated document</span>
+<span class="syn-var">curl</span> <span class="syn-str">https://api.deepl.com/v2/document/{id}/result</span> <span class="syn-op">\</span>
+  <span class="syn-op">-H</span> <span class="syn-str">"Authorization: DeepL-Auth-Key YOUR_API_KEY"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-d</span> <span class="syn-str">'{"document_key": "..."}'</span> <span class="syn-op">-o</span> <span class="syn-str">report_de.pdf</span></pre>
+    </div>
+
+    <!-- Batch Voice -->
+    <div class="code-block" data-example="voice-ex" data-lang="python">
+      <div class="code-block-header">
+        <span class="code-block-file">batch_voice.py</span>
+        <button class="copy-btn" data-copy="voice-python">Copy</button>
+      </div>
+      <pre id="voice-python"><span class="syn-kw">import</span> <span class="syn-var">deepl</span>
+
+<span class="syn-var">client</span> <span class="syn-op">=</span> <span class="syn-var">deepl</span><span class="syn-op">.</span><span class="syn-cls">VoiceClient</span><span class="syn-op">(</span><span class="syn-str">"YOUR_API_KEY"</span><span class="syn-op">)</span>
+
+<span class="syn-cm"># Transcribe + translate an audio file</span>
+<span class="syn-var">result</span> <span class="syn-op">=</span> <span class="syn-var">client</span><span class="syn-op">.</span><span class="syn-fn">translate_audio</span><span class="syn-op">(</span>
+    <span class="syn-prop">file_path</span><span class="syn-op">=</span><span class="syn-str">"meeting_en.mp3"</span><span class="syn-op">,</span>
+    <span class="syn-prop">target_lang</span><span class="syn-op">=</span><span class="syn-str">"DE"</span><span class="syn-op">,</span>
+    <span class="syn-prop">output_format</span><span class="syn-op">=</span><span class="syn-str">"srt"</span>
+<span class="syn-op">)</span>
+
+<span class="syn-fn">print</span><span class="syn-op">(</span><span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-prop">transcript</span><span class="syn-op">)</span>
+<span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-fn">save_subtitles</span><span class="syn-op">(</span><span class="syn-str">"meeting_de.srt"</span><span class="syn-op">)</span></pre>
+    </div>
+    <div class="code-block" data-example="voice-ex" data-lang="node">
+      <div class="code-block-header">
+        <span class="code-block-file">batch_voice.js</span>
+        <button class="copy-btn" data-copy="voice-node">Copy</button>
+      </div>
+      <pre id="voice-node"><span class="syn-kw">import</span> <span class="syn-op">{</span> <span class="syn-cls">VoiceClient</span> <span class="syn-op">}</span> <span class="syn-kw">from</span> <span class="syn-str">'deepl-node'</span><span class="syn-op">;</span>
+
+<span class="syn-kw">const</span> <span class="syn-var">client</span> <span class="syn-op">=</span> <span class="syn-kw">new</span> <span class="syn-cls">VoiceClient</span><span class="syn-op">(</span><span class="syn-str">'YOUR_API_KEY'</span><span class="syn-op">);</span>
+
+<span class="syn-cm">// Transcribe + translate an audio file</span>
+<span class="syn-kw">const</span> <span class="syn-var">result</span> <span class="syn-op">=</span> <span class="syn-kw">await</span> <span class="syn-var">client</span><span class="syn-op">.</span><span class="syn-fn">translateAudio</span><span class="syn-op">(</span><span class="syn-str">'meeting_en.mp3'</span><span class="syn-op">,</span> <span class="syn-op">{</span>
+    <span class="syn-prop">targetLang</span><span class="syn-op">:</span> <span class="syn-str">'de'</span><span class="syn-op">,</span>
+    <span class="syn-prop">outputFormat</span><span class="syn-op">:</span> <span class="syn-str">'srt'</span>
+<span class="syn-op">});</span>
+
+<span class="syn-var">console</span><span class="syn-op">.</span><span class="syn-fn">log</span><span class="syn-op">(</span><span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-prop">transcript</span><span class="syn-op">);</span>
+<span class="syn-kw">await</span> <span class="syn-var">result</span><span class="syn-op">.</span><span class="syn-fn">saveSubtitles</span><span class="syn-op">(</span><span class="syn-str">'meeting_de.srt'</span><span class="syn-op">);</span></pre>
+    </div>
+    <div class="code-block" data-example="voice-ex" data-lang="curl">
+      <div class="code-block-header">
+        <span class="code-block-file">batch_voice.sh</span>
+        <button class="copy-btn" data-copy="voice-curl">Copy</button>
+      </div>
+      <pre id="voice-curl"><span class="syn-cm"># Upload audio for transcription + translation</span>
+<span class="syn-var">curl</span> <span class="syn-str">https://api.deepl.com/v2/voice/translate</span> <span class="syn-op">\</span>
+  <span class="syn-op">-H</span> <span class="syn-str">"Authorization: DeepL-Auth-Key YOUR_API_KEY"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-F</span> <span class="syn-str">"file=@meeting_en.mp3"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-F</span> <span class="syn-str">"target_lang=DE"</span> <span class="syn-op">\</span>
+  <span class="syn-op">-F</span> <span class="syn-str">"output_format=srt"</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SDK GRID ===== -->
+<section class="section" id="sdks" style="background:var(--bg-raised);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label amber">&#9741; SDKs & Libraries</div>
+      <h2 class="section-title">First-class SDKs for every stack</h2>
+      <p class="section-desc">Type-safe, well-documented client libraries so you never have to hand-roll HTTP calls. Install and go.</p>
+    </div>
+    <div class="sdk-grid">
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.05s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#3776AB"></span> Python</span>
+          <span class="sdk-card-status status-available">Available</span>
+        </div>
+        <div class="sdk-card-pkg">deepl</div>
+        <div class="sdk-card-install">pip install deepl</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.1s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#339933"></span> Node.js</span>
+          <span class="sdk-card-status status-available">Available</span>
+        </div>
+        <div class="sdk-card-pkg">deepl-node</div>
+        <div class="sdk-card-install">npm install deepl-node</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.15s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#512BD4"></span> .NET</span>
+          <span class="sdk-card-status status-available">Available</span>
+        </div>
+        <div class="sdk-card-pkg">DeepL.net</div>
+        <div class="sdk-card-install">dotnet add package DeepL.net</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.2s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#ED8B00"></span> Java</span>
+          <span class="sdk-card-status status-available">Available</span>
+        </div>
+        <div class="sdk-card-pkg">com.deepl.api</div>
+        <div class="sdk-card-install">implementation 'com.deepl.api:deepl-java:1.+'</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.25s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#00ADD8"></span> Go</span>
+          <span class="sdk-card-status status-available">Available</span>
+        </div>
+        <div class="sdk-card-pkg">github.com/cluttrdev/deepl-go</div>
+        <div class="sdk-card-install">go get github.com/cluttrdev/deepl-go</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.3s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#CC342D"></span> Ruby</span>
+          <span class="sdk-card-status status-soon">Coming Soon</span>
+        </div>
+        <div class="sdk-card-pkg">deepl-rb</div>
+        <div class="sdk-card-install">gem install deepl-rb</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.35s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#777BB4"></span> PHP</span>
+          <span class="sdk-card-status status-soon">Coming Soon</span>
+        </div>
+        <div class="sdk-card-pkg">deeplcom/deepl-php</div>
+        <div class="sdk-card-install">composer require deeplcom/deepl-php</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.4s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#FA7343"></span> Swift</span>
+          <span class="sdk-card-status status-soon">Coming Soon</span>
+        </div>
+        <div class="sdk-card-pkg">DeepLSwift</div>
+        <div class="sdk-card-install">.package(url: "deepl-swift", from: "1.0.0")</div>
+      </div>
+      <div class="sdk-card animate-on-scroll" style="transition-delay:0.45s">
+        <div class="sdk-card-header">
+          <span class="sdk-card-lang"><span class="sdk-card-lang-dot" style="background:#7F52FF"></span> Kotlin</span>
+          <span class="sdk-card-status status-soon">Coming Soon</span>
+        </div>
+        <div class="sdk-card-pkg">com.deepl:deepl-kotlin</div>
+        <div class="sdk-card-install">implementation("com.deepl:deepl-kotlin:1.+")</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUICKSTARTS ===== -->
+<section class="section" id="quickstarts">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label teal">&#9889; Quickstarts</div>
+      <h2 class="section-title">From zero to production</h2>
+      <p class="section-desc">Step-by-step guides that take you from your first API call to a production integration.</p>
+    </div>
+    <div class="quickstart-grid">
+      <div class="quickstart-card animate-on-scroll" style="transition-delay:0.1s">
+        <div class="quickstart-meta">
+          <span class="quickstart-time">~2 min</span>
+          <span class="quickstart-diff diff-easy">Easy</span>
+        </div>
+        <h4>Translate Text</h4>
+        <p>Your first API call in 3 lines of code. Translate any text to 30+ languages with automatic source detection.</p>
+        <div class="quickstart-tags">
+          <span class="quickstart-tag">Python</span>
+          <span class="quickstart-tag">Node.js</span>
+          <span class="quickstart-tag">cURL</span>
+        </div>
+      </div>
+      <div class="quickstart-card animate-on-scroll" style="transition-delay:0.2s">
+        <div class="quickstart-meta">
+          <span class="quickstart-time">~5 min</span>
+          <span class="quickstart-diff diff-easy">Easy</span>
+        </div>
+        <h4>Translate a PDF</h4>
+        <p>Upload, translate, and download a PDF with formatting preserved. Handle the async polling flow end-to-end.</p>
+        <div class="quickstart-tags">
+          <span class="quickstart-tag">Python</span>
+          <span class="quickstart-tag">Documents</span>
+        </div>
+      </div>
+      <div class="quickstart-card animate-on-scroll" style="transition-delay:0.3s">
+        <div class="quickstart-meta">
+          <span class="quickstart-time">~15 min</span>
+          <span class="quickstart-diff diff-medium">Medium</span>
+        </div>
+        <h4>Continuous Localization</h4>
+        <p>Set up a GitHub Actions workflow to auto-translate your i18n files on every push to main.</p>
+        <div class="quickstart-tags">
+          <span class="quickstart-tag">CI/CD</span>
+          <span class="quickstart-tag">GitHub Actions</span>
+        </div>
+      </div>
+      <div class="quickstart-card animate-on-scroll" style="transition-delay:0.4s">
+        <div class="quickstart-meta">
+          <span class="quickstart-time">~10 min</span>
+          <span class="quickstart-diff diff-medium">Medium</span>
+        </div>
+        <h4>Transcribe & Translate Audio</h4>
+        <p>Build a pipeline that takes an audio file, transcribes it, translates the transcript, and outputs subtitles.</p>
+        <div class="quickstart-tags">
+          <span class="quickstart-tag">Voice</span>
+          <span class="quickstart-tag">Python</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INTEGRATIONS ===== -->
+<section class="section" style="background:var(--bg-raised);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label purple">&#128279; Integrations</div>
+      <h2 class="section-title">Works with your stack</h2>
+      <p class="section-desc">Pre-built integrations for popular frameworks, CI/CD tools, and platforms. Drop DeepL into your existing workflows.</p>
+    </div>
+    <div class="integrations-grid">
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.05s">
+        <div class="integration-icon">&#9883;</div>
+        <h4>React</h4>
+        <p>i18n hooks & components</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.1s">
+        <div class="integration-icon">&#9650;</div>
+        <h4>Next.js</h4>
+        <p>Middleware & API routes</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.15s">
+        <div class="integration-icon">&#128013;</div>
+        <h4>Django</h4>
+        <p>Translation backend</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.2s">
+        <div class="integration-icon">&#128162;</div>
+        <h4>Rails</h4>
+        <p>I18n adapter</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.25s">
+        <div class="integration-icon">&#9881;</div>
+        <h4>GitHub Actions</h4>
+        <p>CI/CD automation</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.3s">
+        <div class="integration-icon">&#127760;</div>
+        <h4>Terraform</h4>
+        <p>Infrastructure as code</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.35s">
+        <div class="integration-icon">&#9889;</div>
+        <h4>Zapier</h4>
+        <p>No-code workflows</p>
+      </div>
+      <div class="integration-card animate-on-scroll" style="transition-delay:0.4s">
+        <div class="integration-icon">&#9729;</div>
+        <h4>AWS</h4>
+        <p>Lambda & S3 triggers</p>
+      </div>
+    </div>
+
+    <div class="featured-integration animate-on-scroll">
+      <h4>Featured: GitHub Actions <span class="featured-badge">Popular</span></h4>
+      <div class="code-block active" style="display:block">
+        <div class="code-block-header">
+          <span class="code-block-file">.github/workflows/translate.yml</span>
+          <button class="copy-btn" data-copy="gha-yaml">Copy</button>
+        </div>
+        <pre id="gha-yaml"><span class="syn-prop">name</span><span class="syn-op">:</span> <span class="syn-str">Translate i18n files</span>
+<span class="syn-prop">on</span><span class="syn-op">:</span>
+  <span class="syn-prop">push</span><span class="syn-op">:</span>
+    <span class="syn-prop">paths</span><span class="syn-op">:</span> <span class="syn-op">[</span><span class="syn-str">'locales/en/**'</span><span class="syn-op">]</span>
+
+<span class="syn-prop">jobs</span><span class="syn-op">:</span>
+  <span class="syn-prop">translate</span><span class="syn-op">:</span>
+    <span class="syn-prop">runs-on</span><span class="syn-op">:</span> <span class="syn-str">ubuntu-latest</span>
+    <span class="syn-prop">steps</span><span class="syn-op">:</span>
+      <span class="syn-op">-</span> <span class="syn-prop">uses</span><span class="syn-op">:</span> <span class="syn-str">actions/checkout@v4</span>
+      <span class="syn-op">-</span> <span class="syn-prop">uses</span><span class="syn-op">:</span> <span class="syn-str">deepl-com/translate-action@v1</span>
+        <span class="syn-prop">with</span><span class="syn-op">:</span>
+          <span class="syn-prop">api-key</span><span class="syn-op">:</span> <span class="syn-str">${{ secrets.DEEPL_API_KEY }}</span>
+          <span class="syn-prop">source-path</span><span class="syn-op">:</span> <span class="syn-str">locales/en</span>
+          <span class="syn-prop">target-langs</span><span class="syn-op">:</span> <span class="syn-str">de,fr,ja,ko,zh</span>
+      <span class="syn-op">-</span> <span class="syn-prop">uses</span><span class="syn-op">:</span> <span class="syn-str">peter-evans/create-pull-request@v6</span>
+        <span class="syn-prop">with</span><span class="syn-op">:</span>
+          <span class="syn-prop">title</span><span class="syn-op">:</span> <span class="syn-str">"chore: update translations"</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== API REFERENCE PREVIEW ===== -->
+<section class="section" id="api-reference">
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-label teal">&#128218; API Reference</div>
+      <h2 class="section-title">API at a glance</h2>
+      <p class="section-desc">Key endpoints across all three suites. Full reference docs include request/response schemas, error codes, and rate limits.</p>
+    </div>
+    <div class="animate-on-scroll" style="overflow-x:auto;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td><span class="api-path">/v2/translate</span></td>
+            <td class="api-desc">Translate text (one or more strings)</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td><span class="api-path">/v2/document</span></td>
+            <td class="api-desc">Upload a document for translation</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td><span class="api-path">/v2/document/{id}</span></td>
+            <td class="api-desc">Check document translation status</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td><span class="api-path">/v2/document/{id}/result</span></td>
+            <td class="api-desc">Download translated document</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-get">GET</span></td>
+            <td><span class="api-path">/v2/languages</span></td>
+            <td class="api-desc">List supported languages</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td><span class="api-path">/v2/glossaries</span></td>
+            <td class="api-desc">Create a glossary</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-get">GET</span></td>
+            <td><span class="api-path">/v2/glossaries</span></td>
+            <td class="api-desc">List all glossaries</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-get">GET</span></td>
+            <td><span class="api-path">/v2/usage</span></td>
+            <td class="api-desc">Check API usage and quota</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-post">POST</span></td>
+            <td><span class="api-path">/v2/voice/translate</span></td>
+            <td class="api-desc">Transcribe and translate audio</td>
+          </tr>
+          <tr>
+            <td><span class="method-badge method-delete">DELETE</span></td>
+            <td><span class="api-path">/v2/glossaries/{id}</span></td>
+            <td class="api-desc">Delete a glossary</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="text-align:center;margin-top:32px;" class="animate-on-scroll">
+      <button class="btn-primary">View Full API Reference <span>&rarr;</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h5>Translate</h5>
+        <a href="#">Text Translation</a>
+        <a href="#">Document Translation</a>
+        <a href="#">Website Translation</a>
+        <a href="#">Glossaries</a>
+        <a href="#">Formality Controls</a>
+      </div>
+      <div class="footer-col">
+        <h5>Voice</h5>
+        <a href="#">Transcription</a>
+        <a href="#">Voice Translation</a>
+        <a href="#">Streaming API</a>
+        <a href="#">Batch Processing</a>
+        <a href="#">Speaker Diarization</a>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <a href="#">API Keys</a>
+        <a href="#">Usage & Analytics</a>
+        <a href="#">Webhooks</a>
+        <a href="#">Team Management</a>
+        <a href="#">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <a href="#">Documentation</a>
+        <a href="#">API Reference</a>
+        <a href="#">SDKs & Libraries</a>
+        <a href="#">Status Page</a>
+        <a href="#">Community</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 DeepL SE. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function() {
+  'use strict';
+
+  // === Mobile Menu ===
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  let mobileOpen = false;
+
+  hamburger.addEventListener('click', () => {
+    mobileOpen = !mobileOpen;
+    mobileNav.classList.toggle('open', mobileOpen);
+    hamburger.innerHTML = mobileOpen
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+  });
+
+  window.closeMobile = function() {
+    mobileOpen = false;
+    mobileNav.classList.remove('open');
+    hamburger.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+  };
+
+  // === Scroll-triggered animations ===
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+  // === Active nav link tracking ===
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const sections = ['translate', 'voice', 'platform', 'workflows', 'sdks', 'api-reference'];
+
+  function updateActiveNav() {
+    const scrollPos = window.scrollY + 120;
+    let current = '';
+    sections.forEach(id => {
+      const section = document.getElementById(id);
+      if (section && section.offsetTop <= scrollPos) {
+        current = id;
+      }
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+
+  // === Generic Tab Controller ===
+  function initTabs(tabSelector, getTarget, activate) {
+    const tabs = document.querySelectorAll(tabSelector);
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activate(getTarget(tab));
+      });
+    });
+  }
+
+  // === Pipeline Tabs ===
+  initTabs('.pipeline-tab', tab => tab.dataset.pipeline, (id) => {
+    document.querySelectorAll('.pipeline-container').forEach(c => c.classList.remove('active'));
+    const target = document.getElementById('pipeline-' + id);
+    if (target) {
+      target.classList.add('active');
+      // Activate first node
+      const firstNode = target.querySelector('.pipeline-node');
+      if (firstNode) firstNode.click();
+    }
+  });
+
+  // === Pipeline Node Click ===
+  const nodeDetails = {
+    // Document pipeline
+    'upload': { title: 'Upload Document', desc: 'Upload a document (PDF, DOCX, PPTX, XLSX, HTML, TXT) for translation. The API extracts translatable content while preserving formatting.', endpoint: 'POST /v2/document', pyMethod: 'translator.translate_document_upload()', nodeMethod: 'translator.translateDocument()' },
+    'extract': { title: 'Extract Content', desc: 'The server extracts all translatable text segments from the uploaded document, preserving layout structure, styles, and non-text elements.', endpoint: 'POST /v2/document (internal)', pyMethod: 'translator.translate_document_upload()', nodeMethod: 'translator.translateDocument()' },
+    'translate-doc': { title: 'Translate Content', desc: 'Neural machine translation processes each text segment with document-level context awareness. Glossaries and formality settings are applied.', endpoint: 'POST /v2/document/{id} (poll)', pyMethod: 'translator.translate_document_wait_until_done()', nodeMethod: 'translator.isDocumentTranslationComplete()' },
+    'assemble': { title: 'Assemble Document', desc: 'Translated text is reinserted into the original document structure. Formatting, images, tables, and styles are preserved exactly.', endpoint: 'POST /v2/document/{id} (poll)', pyMethod: 'translator.translate_document_wait_until_done()', nodeMethod: 'translator.isDocumentTranslationComplete()' },
+    'download': { title: 'Download Result', desc: 'Download the fully translated document in its original format. The file is identical in structure to the source, with all text translated.', endpoint: 'POST /v2/document/{id}/result', pyMethod: 'translator.translate_document_download()', nodeMethod: 'translator.downloadDocument()' },
+    // Voice pipeline
+    'ingest': { title: 'Ingest Audio', desc: 'Upload audio or video files for processing. Supports MP3, WAV, M4A, MP4, and WebM formats up to 500MB.', endpoint: 'POST /v2/voice/ingest', pyMethod: 'voice.ingest(file_path)', nodeMethod: 'voice.ingest(filePath)' },
+    'transcribe': { title: 'Transcribe Speech', desc: 'Automatic speech recognition converts audio to text with timestamps, speaker diarization, and punctuation.', endpoint: 'POST /v2/voice/transcribe', pyMethod: 'voice.transcribe(audio_id)', nodeMethod: 'voice.transcribe(audioId)' },
+    'translate-voice': { title: 'Translate Text', desc: 'The transcribed text is translated using DeepL\'s neural translation engine, preserving sentence structure and meaning.', endpoint: 'POST /v2/translate', pyMethod: 'translator.translate_text(transcript)', nodeMethod: 'translator.translateText(transcript)' },
+    'synthesize': { title: 'Synthesize Speech', desc: 'Text-to-speech synthesis generates natural-sounding audio in the target language, with voice cloning support.', endpoint: 'POST /v2/voice/synthesize', pyMethod: 'voice.synthesize(text, voice_id)', nodeMethod: 'voice.synthesize(text, voiceId)' },
+    'deliver': { title: 'Deliver Output', desc: 'Download the final output: translated audio, subtitles (SRT/VTT), or transcript in the target language.', endpoint: 'GET /v2/voice/{id}/result', pyMethod: 'voice.download(job_id)', nodeMethod: 'voice.download(jobId)' },
+    // Localization pipeline
+    'push': { title: 'Push Content', desc: 'Push source content (JSON, XLIFF, PO, strings files) from your repo or CMS into the localization pipeline via API or CI integration.', endpoint: 'POST /v2/localize/push', pyMethod: 'localize.push(source_path)', nodeMethod: 'localize.push(sourcePath)' },
+    'match-tm': { title: 'Match Translation Memory', desc: 'Source segments are matched against your glossaries and translation memory. Exact matches reuse existing translations, reducing cost and ensuring consistency.', endpoint: 'POST /v2/glossaries/match', pyMethod: 'glossary.match(segments)', nodeMethod: 'glossary.match(segments)' },
+    'translate-loc': { title: 'Translate Segments', desc: 'Unmatched segments are translated by DeepL with glossary enforcement and context-aware quality. Formality and tone controls are applied per-locale.', endpoint: 'POST /v2/translate', pyMethod: 'translator.translate_text(segments)', nodeMethod: 'translator.translateText(segments)' },
+    'review': { title: 'Review Translations', desc: 'Translated content enters a review queue. Reviewers can approve, edit, or reject translations through the API or dashboard.', endpoint: 'POST /v2/localize/review', pyMethod: 'localize.submit_review(batch_id)', nodeMethod: 'localize.submitReview(batchId)' },
+    'pull': { title: 'Pull Translations', desc: 'Pull approved translations back to your repo, CMS, or CI pipeline. Supports JSON, XLIFF, PO, and strings file formats.', endpoint: 'GET /v2/localize/pull', pyMethod: 'localize.pull(target_path)', nodeMethod: 'localize.pull(targetPath)' }
+  };
+
+  document.querySelectorAll('.pipeline-node').forEach(node => {
+    node.addEventListener('click', () => {
+      const pipelineId = node.dataset.pipeline;
+      const container = document.getElementById('pipeline-' + pipelineId);
+      container.querySelectorAll('.pipeline-node').forEach(n => n.classList.remove('active'));
+      node.classList.add('active');
+
+      const detail = nodeDetails[node.dataset.node];
+      if (!detail) return;
+
+      const detailPanel = container.querySelector('.pipeline-detail');
+      detailPanel.innerHTML = `
+        <div>
+          <div class="pipeline-detail-title">${detail.title}</div>
+          <div class="pipeline-detail-desc">${detail.desc}</div>
+          <div class="pipeline-detail-endpoint">${detail.endpoint}</div>
+        </div>
+        <div>
+          <div class="pipeline-detail-title" style="margin-bottom:12px">SDK Method</div>
+          <div class="pipeline-detail-sdk">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Python</strong></div>
+            <code>${detail.pyMethod}</code>
+          </div>
+          <div class="pipeline-detail-sdk" style="margin-top:12px">
+            <div style="margin-bottom:8px"><strong style="color:var(--text);font-size:12px">Node.js</strong></div>
+            <code>${detail.nodeMethod}</code>
+          </div>
+        </div>
+      `;
+    });
+  });
+
+  // === Code Example Tabs ===
+  const currentLang = { value: 'python' };
+  const currentExample = { value: 'text' };
+
+  function showCodeBlock() {
+    document.querySelectorAll('.code-block[data-example]').forEach(block => {
+      const matches = block.dataset.example === currentExample.value && block.dataset.lang === currentLang.value;
+      block.classList.toggle('active', matches);
+    });
+  }
+
+  initTabs('.lang-tab', tab => tab.dataset.lang, (lang) => {
+    currentLang.value = lang;
+    showCodeBlock();
+  });
+
+  initTabs('.example-tab', tab => tab.dataset.example, (example) => {
+    currentExample.value = example;
+    showCodeBlock();
+  });
+
+  // === Copy to Clipboard ===
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.copy;
+      const pre = document.getElementById(targetId);
+      if (!pre) return;
+      const text = pre.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
